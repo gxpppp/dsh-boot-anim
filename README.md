@@ -152,6 +152,9 @@ powershell -ExecutionPolicy Bypass -File verify-headless.ps1
 在「轮廓勾勒完成」与「横线展开」之间插了一段过场：鲸鱼淡出重组、左移让位，
 官方字标在其右侧浮现；若后端仍在加载，一道斜向光带反复扫过字面。
 
+字标要等**鲸鱼左移进行到 82%** 才浮现 —— 早于此时会被还停在中央的鲸鱼压住，
+两者都是矢量、会直接叠在一起。这是逐帧实测出来的，不是估的。
+
 ### 字标用的是官方矢量
 
 不是文字排版，而是直接从上游 `dsh-client-ui-primitives` 的 `BrandWordmark`
