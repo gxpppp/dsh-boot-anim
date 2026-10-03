@@ -1,0 +1,33 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 语法检查（宿主半侧与前端载荷）
+        run: |
+          node --check lib/index.js
+          node --check lib/boot-anim.js
+          for f in _verify/*.mjs; do node --check "$f"; done
+
+      - name: 宿主半侧单测（注入行产出）
+        run: node _verify/test-host.mjs
+
+      - name: 结构完整性检查
+        run: node _verify/check-structure.mjs
+

@@ -8,6 +8,10 @@ _tool/
 _verify/harness.built.html
 docs/_verify/snippet-standalone.js
 
+# 演示素材的中间产物（抽帧目录；成品 gif/webm/mp4/cover 保留）。
+docs/media/frames/
+_verify/rec-raw/
+
 # 本地验证残留。
 _verify/fake-profile/
 _verify/profile-backup/

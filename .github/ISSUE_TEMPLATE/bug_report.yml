@@ -1,0 +1,55 @@
+name: 缺陷报告
+description: 报告启动动画或 UI 入场过渡的问题
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量填全，尤其是**观察到的实际表现**——动画类问题靠文字描述比截图更有效。
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DSH 桌面版版本
+      description: 设置 → 关于，或标题栏版本号
+      placeholder: 例如 0.2.0-rc.2
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: 操作系统
+      placeholder: 例如 Windows 11 26100
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: 问题出现在哪一段
+      options:
+        - 启动动画 ①~⑥（黑屏 / 鲸鱼 / 双线 / 勾勒 / 展开 / 落白）
+        - UI 入场 ⑦（面板由外向内平移）
+        - 安装或卸载
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望表现
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际表现
+      description: 若是时序问题，请说明快了还是慢了、大概差多少
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息
+      description: 是否装配了皮肤、是否开启减少动效、是否有控制台报错（Ctrl+Shift+I）
+    validations:
+      required: false
