@@ -54,9 +54,20 @@ function applyRows(rows) {
   setTimeout(function () {
     applyRows(globalThis.__INJECTIONS__);
     // 模拟应用插件树挂载完成：替换加载页为真实 AppFrame
-    setTimeout(mountApp, window.__APP_DELAY_MS__ || 1800);
+    setTimeout(function () { window.__FAIL_MODE__ ? failApp() : mountApp(); }, window.__APP_DELAY_MS__ || 1800);
   }, 30);
 })();
+
+function failApp() {
+  var boot = document.querySelector('[data-dsh-boot]');
+  var title = document.createElement('div');
+  title.textContent = 'Failed to load plugins';
+  var item = document.createElement('div');
+  item.textContent = 'some-plugin: import failed';
+  boot.appendChild(title);
+  boot.appendChild(item);
+}
+window.__FAIL_MODE__ = false;
 
 function mountApp() {
   var root = document.getElementById('root');

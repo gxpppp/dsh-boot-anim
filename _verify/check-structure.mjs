@@ -61,6 +61,17 @@ for (const [label, needle] of [
   else ok(label + ' 就位')
 }
 
+// 字标数据：结构必须与上游一致（数量由生成器断言，这里复核关键项）
+const brand = JSON.parse(fs.readFileSync('lib/brand-wordmark.json', 'utf8'))
+if (brand.parts.length !== 18) fail('字标图元应为 18，实际 ' + brand.parts.length)
+else ok('字标图元 18 个')
+if (Object.keys(brand.clips).length !== 2) fail('字标裁剪框应为 2')
+else ok('字标裁剪框 2 个')
+if (brand.parts.filter((p) => p.c === 'inv').length !== 7) fail('反色图元应为 7')
+else ok('反色图元 7 个')
+if (brand.viewBox !== '26 0 156 24') fail('字标 viewBox 应为纯文字版')
+else ok('字标 viewBox = ' + brand.viewBox)
+
 for (const f of ['LICENSE', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'cordis.patch.yml']) {
   if (!fs.existsSync(f)) fail('缺根文件 ' + f)
   else ok('根文件 ' + f + ' 存在')

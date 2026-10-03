@@ -22,13 +22,16 @@ const T = path.join(ROOT, '_verify')
 const css = fs.readFileSync(path.join(ROOT, 'lib', 'boot-anim.css'), 'utf8')
 const js = fs.readFileSync(path.join(ROOT, 'lib', 'boot-anim.js'), 'utf8')
 
+const brand = JSON.parse(fs.readFileSync(path.join(ROOT, 'lib', 'brand-wordmark.json'), 'utf8'))
+
 const html = fs.readFileSync(path.join(T, 'harness.html'), 'utf8')
   .replace('globalThis.__INJECTIONS__ = window.__INJECTIONS__ || [];',
     'globalThis.__INJECTIONS__ = ' + JSON.stringify([
+      { kind: 'global', name: '__DSH_BRAND_WORDMARK__', value: brand },
       { kind: 'style', text: css },
       { kind: 'script', placement: 'head', text: js },
     ]) + ';')
-  .replace('window.__APP_DELAY_MS__ || 1800', '1600')
+  .replace('window.__APP_DELAY_MS__ || 1800', String(process.env.DSH_APP_DELAY_MS || 1600))
 fs.writeFileSync(path.join(T, 'harness.built.html'), html, 'utf8')
 
 const browser = await chromium.launch()
@@ -40,7 +43,9 @@ page.on('pageerror', (e) => logs.push('[pageerror] ' + e.message))
 const t0 = Date.now()
 await page.goto(pathToFileURL(path.join(T, 'harness.built.html')).href)
 
-const targets = [0, 350, 650, 950, 1100, 1300, 1600, 1900, 2300, 2700, 3000, 3300, 3600, 3900, 4300, 4700, 5200, 6000]
+const targets = process.env.DSH_TARGETS
+  ? process.env.DSH_TARGETS.split(',').map(Number)
+  : [0, 350, 650, 950, 1100, 1300, 1600, 1900, 2300, 2600, 2900, 3200, 3500, 3800, 4100, 4400, 4700, 5000, 5400, 6000]
 const marks = []
 for (const t of targets) {
   const wait = t - (Date.now() - t0) + 200
@@ -50,12 +55,19 @@ for (const t of targets) {
     const stage = document.querySelector('[data-dsh-boot-anim]')
     const w = document.querySelector('.ba-whale')
     const frame = document.querySelector('[data-shell-overlay]')
+    const mk = document.querySelector('.ba-mark')
+    const sh = document.querySelector('.ba-sheen')
+    const wh = document.querySelector('.ba-white')
+    const op = (el) => (el ? Number(getComputedStyle(el).opacity).toFixed(2) : null)
+    const tf = (el) => (el ? getComputedStyle(el).transform : null)
     return {
       stage: stage ? 1 : 0,
-      whaleOpacity: w ? Number(getComputedStyle(w).opacity).toFixed(2) : null,
-      whaleTransform: w ? getComputedStyle(w).transform.slice(0, 60) : null,
+      whaleOp: op(w),
+      whaleTx: w ? (tf(w) || '').replace(/matrix\(([^)]*)\)/, '$1').split(',')[4] : null,
+      markOp: op(mk),
+      sheenOp: op(sh),
+      whiteOp: op(wh),
       appMounted: frame ? 1 : 0,
-      bg: getComputedStyle(document.body).backgroundColor,
     }
   })
   marks.push({ t, elapsed, ...state })

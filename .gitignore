@@ -6,7 +6,16 @@ _tool/
 
 # 无头验收时生成的中间产物（可选：删掉下面两行可把见证截图一起提交）。
 _verify/harness.built.html
+_verify/harness-fail.html
+_verify/sheen-*.png
 docs/_verify/snippet-standalone.js
+
+# 逐帧截图是每次运行产物，文件名随采样点变化 —— 由 verify-headless.ps1 随时重建。
+_verify/f*.png
+_verify/final.png
+_verify/fail-final.png
+_verify/sheen-*.png
+_verify/wordmark-preview.png
 
 # 演示素材的中间产物（抽帧目录；成品 gif/webm/mp4/cover 保留）。
 docs/media/frames/
