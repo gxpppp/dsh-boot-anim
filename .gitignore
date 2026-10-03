@@ -35,3 +35,13 @@ desktop.ini
 # 依赖与日志。
 node_modules/
 *.log
+
+# 诊断脚本的中间产物（每次运行动态生成，不入库）。
+_verify/allframes/
+_verify/realsite/
+_verify/real-frontend.html
+_verify/real-frontend.png
+_verify/realfront.png
+_verify/harness.*.html
+_verify/rec-raw/
+docs/media/frames/

@@ -90,14 +90,21 @@
 [data-dsh-boot-anim] .ba-mark svg { display: block; height: 100%; width: auto; }
 
 /* 字标本体在加载期间压暗，好让掠过的光带有对比可循。
+   压得比想象中狠 —— 因为高亮层是纯白，字标越暗、扫光的对比越明显。
    光带停下后由脚本恢复满亮，避免静态时字标发灰。 */
-[data-dsh-boot-anim] .ba-mark.is-loading { opacity: 0.32; }
+[data-dsh-boot-anim] .ba-mark.is-loading { opacity: 0.22; }
 
 /* 光带层：与字标同形的高亮副本，被移动的光带遮罩裁切。
-   不用 mix-blend-mode —— 屏幕混合下「白叠白」恒为白，等于没有效果。 */
+   不用 mix-blend-mode —— 屏幕混合下「白叠白」恒为白，等于没有效果。
+   定位必须与 .ba-mark 完全一致（居中 + 同一个 --ba-mark-h），否则两层不重合：
+   曾因这里写成 inset:0 而铺满容器，导致字标副本被放大 3.46 倍、跑到左上角。 */
 [data-dsh-boot-anim] .ba-sheen {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: var(--ba-mark-h, 28px);
+  width: auto;
   opacity: 0;
 }
 [data-dsh-boot-anim] .ba-sheen svg { display: block; height: 100%; width: auto; }

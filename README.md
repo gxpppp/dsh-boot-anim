@@ -67,6 +67,7 @@ resources/app.asar/lib/main.js
 | — | *收笔后停住，等应用真正挂载* | ~2.15 – ~3.3s |
 | ⑤ | 中央横线向上下两侧展开，画面一分为二 | ~3.3 – ~4.2s |
 | ⑥ | 展开同时鲸鱼缓缓消失，露出默认白底 / 已装配皮肤 | ~3.45 – ~4.2s |
+| — | *缓冲过场：鲸鱼重组左移 → 官方字标浮现 → 光带等待后端* | ~2.2 – ~4.2s |
 | ⑦ | UI 以由外向内、环环平移的方式入场 | ~4.3 – ~5.3s |
 | | **总时长** | **≈ 5.6s** |
 
@@ -143,6 +144,37 @@ powershell -ExecutionPolicy Bypass -File verify-headless.ps1
 鲸鱼组套 `scaleY(0.018)` 压成约 2px 的横线，再 `scaleY: 0.018 → 1` 长成鲸鱼。
 但压扁会把描边一起压细到看不见——解法是 `vector-effect: non-scaling-stroke`，
 描边宽度不随 transform 缩放，压平时它仍是一条实心横线。这样 ③ 与 ④ 不必切换 DOM。
+
+---
+
+## 缓冲过场
+
+在「轮廓勾勒完成」与「横线展开」之间插了一段过场：鲸鱼淡出重组、左移让位，
+官方字标在其右侧浮现；若后端仍在加载，一道斜向光带反复扫过字面。
+
+### 字标用的是官方矢量
+
+不是文字排版，而是直接从上游 `dsh-client-ui-primitives` 的 `BrandWordmark`
+组件提取的矢量数据：**18 个图元 / 13931 字符 path / 2 处裁剪框**，
+由 `_verify/gen-wordmark.mjs` 自动生成并断言结构。手抄这 1.4 万字符不可能不出错。
+
+数据经 `global` 注入行送进页面 —— `boot-anim.js` 是注入的独立脚本，无法 `import`。
+
+### 光带的实现
+
+光带层是字标的**同形副本**，被一道移动的遮罩裁切：只有光带扫过的部分才高亮出来。
+
+这里有两个坑，都是实测才发现的：
+
+- **不能用 `mix-blend-mode: screen`** —— 屏幕混合下「白叠白」恒为白，等于没有效果；
+- **定位必须与字标层完全一致** —— 曾因写成 `inset: 0` 而铺满容器，
+  导致字标副本被放大 3.46 倍、跑到左上角（看起来像两个巨大的汉字）。
+
+另外「加载期间压暗字标」也踩过一次：内联样式会被入场动画的
+`fill: 'forwards'` 终值覆盖（实测 `inline 0.22` 而 `computed 1`），
+必须改用 WAAPI 动画才能压下去。
+
+详见 [docs/04 第 9 节](docs/04-验证结果.md)。
 
 ---
 
@@ -255,6 +287,11 @@ dsh-boot-anim/
     ├── probe-loader.mjs          用真实加载器验证 bundle 被接受
     ├── probe-e2e.mjs             用真实 cordis 跑端到端
     ├── check-structure.mjs       结构完整性 + 敏感信息扫描
+    ├── render-all-frames.mjs     全量逐帧渲染（供逐帧检视）
+    ├── gen-wordmark.mjs          从上游提取官方字标矢量
+    ├── diag-sheen.mjs            两层几何是否重合
+    ├── diag-opacity.mjs          压暗是否生效
+    ├── diag-progress.mjs         鲸鱼与字标是否重叠
     └── fish-logo-path.txt        鲸鱼 path 校验锚点
 ````
 
