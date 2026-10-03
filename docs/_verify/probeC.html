@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>probe C: var-timing + WAAPI vs CSS</title>
+<style>
+  html,body{margin:0;background:#000;color:#fff;font:12px monospace}
+  .box{width:200px;height:60px;background:#e33;margin:8px}
+  #vr{opacity:var(--o,1);transform:translateX(var(--x,0px));transition:opacity 400ms linear, transform 400ms linear}
+  #vr.go{opacity:var(--o2,1);transform:translateX(var(--x2,0px))}
+  #wacss{transition:opacity 400ms linear}
+  #wacss.hide{opacity:0}
+</style></head><body>
+<div class="box" id="vr"></div>
+<div class="box" id="wacss"></div>
+<script>
+window.__R__={marks:[],samples:[]};
+const R=window.__R__;
+const mark=(k,o)=>R.marks.push({k,t:+performance.now().toFixed(2),...(o||{})});
+const vr=document.getElementById('vr'), wc=document.getElementById('wacss');
+for (const [el,tag] of [[vr,'vr'],[wc,'wc']]) for (const ev of ['transitionrun','transitionstart','transitioncancel','transitionend'])
+  el.addEventListener(ev,e=>mark(tag+':'+ev,{prop:e.propertyName}),true);
+
+// 方案 i：变量直接设起始值 → 等真正的下一帧（rAF 嵌套在 setTimeout 0 之后）再设回目标值
+setTimeout(()=>{
+  const s=getComputedStyle(vr);
+  mark('i-before',{o:s.opacity,x:s.transform});
+  vr.style.setProperty('--o','0'); vr.style.setProperty('--x','-80px');
+  requestAnimationFrame(()=>{
+    vr.style.setProperty('--o','1'); vr.style.setProperty('--x','0px');
+    mark('i-set-back',{o:getComputedStyle(vr).opacity,x:getComputedStyle(vr).transform});
+  });
+},60);
+
+let f=0;
+(function loop(){
+  const s=getComputedStyle(vr);
+  R.samples.push({f:++f,t:+performance.now().toFixed(2),vrO:s.opacity,vrX:s.transform,wcO:getComputedStyle(wc).opacity});
+  if(f<70) requestAnimationFrame(loop);
+})();
+
+// WAAPI 与 CSS 优先级对抗
+setTimeout(()=>{
+  // 让 CSS 类先驱动过渡到 0（400ms）
+  wc.classList.add('hide');
+  mark('css-hide-added',{o:getComputedStyle(wc).opacity});
+  // 100ms 后 WAAPI 抢同一属性
+  setTimeout(()=>{
+    const a=wc.animate([{opacity:1},{opacity:1}],{duration:300,fill:'both',composite:'replace'});
+    mark('waapi-over-css',{heights:JSON.stringify(a.effect.getKeyframes()),playState:a.playState});
+    setTimeout(()=>{ mark('waapi-over-css-100ms',{cssOpacity:getComputedStyle(wc).opacity,inlineStyle:wc.style.cssText}); },100);
+    setTimeout(()=>{ a.cancel(); mark('waapi-cancel-restore',{cssOpacity:getComputedStyle(wc).opacity, inlineStyle:wc.style.cssText}); },200);
+  },100);
+},120);
+setTimeout(()=>{window.__DONE__=true;},1600);
+</script></body></html>

@@ -1,0 +1,17 @@
+{
+  "name": "@local/dsh-boot-anim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DSH 桌面端启动动画（SteamOS 风格分镜）与 UI 分层入场过渡。纯宿主侧 index 注入，无 HTTP 路由、无源码改动。",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

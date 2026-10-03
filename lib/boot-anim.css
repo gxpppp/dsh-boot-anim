@@ -1,0 +1,81 @@
+/* @local/dsh-boot-anim — 舞台样式。
+   全部选择器以 [data-dsh-boot-anim] 作用域前缀，不触碰应用自身的任何类名、令牌或布局。
+   动效数值（曲线 / 时长 / 位移）统一由 lib/boot-anim.js 顶部的 T 令牌驱动，出处见
+   docs/01-方案检索清单.md 的 B2 / B6 / B7。 */
+
+[data-dsh-boot-anim] {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint style;
+  --ba-ink: #000;
+  --ba-fg: #fff;
+  --ba-bg: var(--dsw-alias-bg-base, #fff);
+}
+
+/* 顶/底两片黑幕：初始各占一半 = 全黑；⑤ 起分别向上、向下退场。 */
+[data-dsh-boot-anim] .ba-curtain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--ba-ink);
+}
+[data-dsh-boot-anim] .ba-top { top: 0; height: 50%; }
+[data-dsh-boot-anim] .ba-bottom { bottom: 0; height: 50%; }
+
+/* ⑤ 中央那条横线 */
+[data-dsh-boot-anim] .ba-seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--ba-fg);
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+/* ③ 由两侧向中间延伸的两条线 */
+[data-dsh-boot-anim] .ba-line {
+  position: absolute;
+  top: 50%;
+  width: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--ba-fg);
+  opacity: 0;
+}
+[data-dsh-boot-anim] .ba-line-l { left: 0; transform-origin: left center; }
+[data-dsh-boot-anim] .ba-line-r { right: 0; transform-origin: right center; }
+
+/* ②④ 鲸鱼：与原图标同一条 path，viewBox 23.16 x 17.04。 */
+[data-dsh-boot-anim] .ba-whale {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+[data-dsh-boot-anim] .ba-whale-g { transform-box: fill-box; transform-origin: center; }
+
+/* 非缩放描边：鲸鱼被压扁成线时描边不跟着变细，压平即是一条横线。 */
+[data-dsh-boot-anim] .ba-p {
+  fill: none;
+  stroke: var(--ba-fg);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+/* ⑦ 入场期间的一次性提示，动画结束后由脚本摘除。 */
+[data-ba-anim] { will-change: transform, opacity; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-dsh-boot-anim] { display: none !important; }
+}

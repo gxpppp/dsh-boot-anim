@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>DeepSeek Harness</title>
+<style>
+  html,body,#root{height:100%;margin:0}
+  body{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#0f1115;
+       background:var(--dsw-alias-bg-base,#fff)}
+  :root{--dsw-alias-bg-base:#fff}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// —— 模拟 dsh-web-frontend 的入口 + 注入行解释器 hM(e,n) ——
+globalThis.__DSH_BOOT_READY__ = Promise.withResolvers();
+globalThis.__DSH_BOOT_ANIM_DEBUG__ = true;
+globalThis.__INJECTIONS__ = window.__INJECTIONS__ || [];
+
+function applyRows(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    var o = rows[i];
+    if (o.kind === 'global') { globalThis[o.name] = o.value; }
+    else if (o.kind === 'script') {
+      var s = document.createElement('script');
+      s.textContent = o.text;
+      (o.placement === 'head' ? document.head : document.body).append(s);
+    } else if (o.kind === 'style') {
+      var st = document.createElement('style');
+      st.textContent = o.text;
+      document.head.append(st);
+    } else if (o.kind === 'html') {
+      (o.placement === 'head' ? document.head : document.body).insertAdjacentHTML('beforeend', o.html);
+    }
+  }
+}
+</script>
+<script>
+// —— 模拟前端自带的加载页 tM：root 下 data-dsh-boot 元素 ——
+(function () {
+  var root = document.getElementById('root');
+  var boot = document.createElement('div');
+  boot.setAttribute('data-dsh-boot', '');
+  boot.style.cssText = 'height:100%;display:grid;place-items:center';
+  boot.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:16px">'
+    + '<div style="font-size:16px;font-weight:600;letter-spacing:.08em">HARNESS</div>'
+    + '<div style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(0,0,0,.1)"></div>'
+    + '<div style="font-size:12px;color:#81858c">Loading plugins…</div></div>';
+  root.appendChild(boot);
+  globalThis.__BOOT_EL__ = boot;
+
+  // 启动动画的行在这里到达（真实环境下经由 dsh-desktop boot IPC）
+  setTimeout(function () {
+    applyRows(globalThis.__INJECTIONS__);
+    // 模拟应用插件树挂载完成：替换加载页为真实 AppFrame
+    setTimeout(mountApp, window.__APP_DELAY_MS__ || 1800);
+  }, 30);
+})();
+
+function mountApp() {
+  var root = document.getElementById('root');
+  root.innerHTML = '';
+  var frame = document.createElement('div');
+  frame.style.cssText = 'height:100%;display:grid;'
+    + 'grid-template-columns:280px minmax(400px,1fr) minmax(0px,340px)';
+  frame.innerHTML = ''
+    + '<div style="overflow:hidden;background:#f9fafb;border-right:1px solid rgba(0,0,0,.08)">'
+    +   '<div data-slot="sidebar" style="display:contents">'
+    +     '<div style="height:100%;padding:12px;box-sizing:border-box">'
+    +       '<div style="height:32px;font-weight:600">DeepSeek Harness</div>'
+    +       '<div style="margin-top:12px;height:calc(100% - 60px);border-radius:8px;background:rgba(0,0,0,.04)"></div>'
+    +     '</div>'
+    +   '</div></div>'
+    + '<div style="display:flex;flex-direction:column;min-width:0;background:#fff">'
+    +   '<div data-slot="conversation.header" style="display:contents"><div style="height:52px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;padding:0 16px">标题栏</div></div>'
+    +   '<div data-slot="conversation.session" style="display:contents"><div style="flex:1;height:100%;display:grid;place-items:center;color:#61666b">对话区</div></div>'
+    +   '<div data-slot="conversation.composer" style="display:contents"><div style="margin:12px;height:88px;border-radius:12px;background:rgba(0,0,0,.04)"></div></div>'
+    + '</div>'
+    + '<div style="overflow:hidden;background:#f9fafb;border-left:1px solid rgba(0,0,0,.08)">'
+    +   '<div data-slot="rightbar" style="display:contents">'
+    +     '<div style="height:100%;padding:12px;box-sizing:border-box">'
+    +       '<div style="height:28px;font-weight:600">侧边面板</div>'
+    +       '<div style="margin-top:12px;height:calc(100% - 56px);border-radius:8px;background:rgba(0,0,0,.04)"></div>'
+    +     '</div>'
+    +   '</div></div>'
+    + '<div data-shell-overlay></div>';
+  root.appendChild(frame);
+}
+</script>
+</body>
+</html>

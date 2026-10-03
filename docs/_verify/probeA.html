@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>enter-anim probe A</title>
+<style>
+  html,body{margin:0;background:#000;color:#fff;font:14px monospace}
+  .box{width:220px;height:80px;background:#e33;margin:10px}
+  /* 1. @starting-style 驱动 */
+  #st{opacity:1;transform:translateX(0);transition:opacity 400ms linear, transform 400ms linear}
+  @starting-style{ #st{opacity:0;transform:translateX(-80px)} }
+  /* 2. 变量驱动 */
+  #vr{opacity:var(--o,1);transform:translateX(var(--x,0px));transition:opacity 400ms linear, transform 400ms linear}
+</style></head><body>
+<div class="box" id="st"></div>
+<div class="box" id="vr"></div>
+<div class="box" id="wa"></div>
+<script>
+window.__R__ = { marks: [], supports: {
+  transitionBehavior: CSS.supports('transition-behavior','allow-discrete'),
+  has: CSS.supports('selector(:has(*))'),
+  viewTransition: typeof document.startViewTransition === 'function',
+  animationApi: typeof Element.prototype.animate === 'function',
+  reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+  ua: navigator.userAgent,
+}, samples: [] };
+const R = window.__R__;
+const mark = (k, o) => R.marks.push({ k, t: +performance.now().toFixed(2), ...(o||{}) });
+const st = document.getElementById('st'), vr = document.getElementById('vr'), wa = document.getElementById('wa');
+mark('script', { stOpacity: getComputedStyle(st).opacity, stX: getComputedStyle(st).transform });
+for (const id of ['st','vr','wa']) {
+  const el = document.getElementById(id);
+  for (const ev of ['transitionrun','transitionstart','transitioncancel','transitionend'])
+    el.addEventListener(ev, e => mark(id+':'+ev, { prop: e.propertyName }), true);
+}
+let frame = 0;
+(function loop(){
+  R.samples.push({ f: ++frame, t: +performance.now().toFixed(2), stO: getComputedStyle(st).opacity, vrO: getComputedStyle(vr).opacity, waT: getComputedStyle(wa).transform });
+  if (frame < 40) requestAnimationFrame(loop);
+})();
+// 变量驱动：首帧后改变量
+requestAnimationFrame(() => {
+  const r = vr.getBoundingClientRect();
+  mark('vr-before-var', { o: getComputedStyle(vr).opacity, rectX: +r.x.toFixed(1) });
+  vr.style.setProperty('--o', '0'); vr.style.setProperty('--x', '-80px');
+  requestAnimationFrame(() => {
+    vr.style.setProperty('--o', '1'); vr.style.setProperty('--x', '0px');
+    mark('vr-var-set-back', { o: getComputedStyle(vr).opacity });
+  });
+});
+// WAAPI
+setTimeout(() => {
+  const a = wa.animate([{ opacity: 0, transform: 'translateX(80px)' }, { opacity: 1, transform: 'translateX(0)' }], { duration: 600, easing: 'linear', fill: 'both' });
+  mark('wa-animate', { playState: a.playState });
+  a.addEventListener('finish', () => mark('wa-finish', {}));
+  setTimeout(() => { a.pause(); mark('wa-pause', { playState: a.playState, t: a.currentTime }); }, 200);
+  setTimeout(() => { a.cancel(); mark('wa-cancel', { playState: a.playState, computedOpacity: getComputedStyle(wa).opacity, computedX: getComputedStyle(wa).transform }); }, 400);
+}, 50);
+setTimeout(() => { window.__DONE__ = true; }, 1200);
+</script></body></html>

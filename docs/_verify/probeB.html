@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>enter-anim probe B (observer)</title>
+<style>
+  html,body{margin:0;background:#000;color:#fff}
+  #host{display:flex;gap:8px;padding:20px}
+  .card{width:120px;height:60px;background:#48f}
+  .enter{opacity:1;transform:translateX(0);transition:opacity 400ms linear,transform 400ms linear}
+  .enter.init{opacity:0;transform:translateX(-60px)}
+</style></head><body>
+<div id="host"><div class="card" data-n="0"></div></div>
+<script>
+window.__R__ = { marks: [] };
+const R = window.__R__;
+const mark=(k,o)=>R.marks.push({k,t:+performance.now().toFixed(2),...(o||{})});
+const host = document.getElementById('host');
+const cards = () => [...host.querySelectorAll('.card')];
+
+// A) MutationObserver + 加类名（快照法）：能自动捕获初始元素吗？
+const mo = new MutationObserver(records => {
+  for (const rec of records) for (const n of rec.addedNodes) {
+    if (!(n instanceof HTMLElement) || !n.classList.contains('card')) continue;
+    mark('mo-added', { n: n.dataset.n, opacity: getComputedStyle(n).opacity, transform: getComputedStyle(n).transform });
+  }
+});
+mo.observe(host, { childList: true });
+
+// B) 快照法：对已存在的元素打 .init 再移除
+const snap = (el, tag) => {
+  el.classList.add('enter','init');
+  const a = getComputedStyle(el);
+  mark(tag+'-snapshot', { opacity: a.opacity, transform: a.transform });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.classList.remove('init');
+    mark(tag+'-release', { opacity: getComputedStyle(el).opacity });
+  }));
+};
+cards().forEach((el,i) => {
+  const s = getComputedStyle(el);
+  mark('initial-static', { n: el.dataset.n, opacity: s.opacity, transform: s.transform });
+});
+snap(cards()[0], 'first');
+
+// 双 rAF 后动态插入一个卡片并立刻快照
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  const el = document.createElement('div');
+  el.className = 'card'; el.dataset.n = '1';
+  host.appendChild(el);
+  setTimeout(() => snap(el, 'dyn'), 0);
+}));
+setTimeout(() => { window.__DONE__ = true; }, 1200);
+</script></body></html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>DSH frame mock</title>
+<style>
+  html,body{margin:0;height:100%;background:#101216;color:#e8eaed;font:13px/1.4 system-ui,sans-serif}
+  #root{height:100%}
+  #frame{height:100%;display:grid;grid-template-columns:280px minmax(400px,1fr) 300px;grid-template-rows:100%}
+  .col{min-width:0;overflow:hidden}
+  #side{background:#171a20;border-right:1px solid #23262e}
+  #center{display:flex;flex-direction:column;background:#0f1115}
+  #ctitle{height:44px;flex:none;border-bottom:1px solid #23262e}
+  #msgs{flex:1;min-height:0;padding:16px;overflow:auto}
+  #composer{flex:none;height:62px;margin:0 16px 14px;border:1px solid #2b2f38;border-radius:12px;background:#171a20}
+  #right{background:#171a20;border-left:1px solid #23262e}
+  .bubble{height:46px;margin:8px 0;border-radius:10px;background:#1b1f27}
+</style></head><body>
+<div id="root"><div id="frame" data-dsh-mock>
+  <div class="col" id="side"></div>
+  <div class="col" id="center">
+    <div id="ctitle"></div>
+    <div id="msgs"><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div></div>
+    <div id="composer"></div>
+  </div>
+  <div class="col" id="right"></div>
+</div></div>
+<script>
+/* 模拟 DSH 的 React 挂载时序：延迟插入子元素，用来验证脚本在"元素后到"时的表现 */
+window.__MOCK__ = { mode: new URLSearchParams(location.search).get('mode') || 'immediate' };
+if (window.__MOCK__.mode === 'delayed') {
+  const f = document.getElementById('frame');
+  const kids = [...f.children];
+  f.innerHTML = '';
+  let i = 0;
+  (function add() {
+    if (i >= kids.length) return;
+    f.appendChild(kids[i++]);
+    setTimeout(add, 60);
+  })();
+}
+</script>
+</body></html>

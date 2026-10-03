@@ -1,0 +1,24 @@
+# 解包出来的 DSH 第三方打包源码 —— 不属于本插件，含大量第三方代码与全盘路径清单，不入库。
+_extract/
+
+# app.asar 读取工具与清单（清单每行含机器绝对路径）。
+_tool/
+
+# 无头验收时生成的中间产物（可选：删掉下面两行可把见证截图一起提交）。
+_verify/harness.built.html
+docs/_verify/snippet-standalone.js
+
+# 本地验证残留。
+_verify/fake-profile/
+_verify/profile-backup/
+
+# 系统与编辑器。
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 依赖与日志。
+node_modules/
+*.log

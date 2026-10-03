@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>probe D: view transition</title>
+<style>
+  html,body{margin:0;background:#111;color:#eee;font:12px monospace}
+  #panel{width:200px;height:60px;background:#3af}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:300ms}
+</style></head><body>
+<div id="panel"></div>
+<script>
+window.__R__={marks:[],supports:{}};
+const R=window.__R__;
+const mark=(k,o)=>R.marks.push({k,t:+performance.now().toFixed(2),...(o||{})});
+R.supports.st=typeof document.startViewTransition;
+R.supports.vtCSS = CSS.supports('view-transition-name','none');
+R.supports.startingStyleRule = (()=>{ try{ document.querySelector('style'); return true }catch(e){ return false } })();
+(async()=>{
+  try{
+    const t = document.startViewTransition(()=>{ document.getElementById('panel').style.transform='translateX(120px)'; });
+    R.supports.returnedType = Object.prototype.toString.call(t);
+    R.supports.hasReady = typeof t.ready?.then === 'function';
+    mark('vt-started',{});
+    t.ready.then(()=>mark('vt-ready',{}),e=>mark('vt-ready-rejected',{e:String(e)}));
+    t.finished.then(()=>mark('vt-finished',{}),e=>mark('vt-finished-rejected',{e:String(e)}));
+    await t.finished;
+  }catch(e){ mark('vt-throw',{e:String(e)}); }
+  window.__DONE__=true;
+})();
+</script></body></html>

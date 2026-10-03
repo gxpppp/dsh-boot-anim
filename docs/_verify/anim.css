@@ -1,0 +1,20 @@
+@layer dsh-enter-anim {
+  /* 只作用于带标记的 frame，避免污染其它页面 */
+  #root > [data-dsh-enter-ready] { --dsh-enter-x: 0px; --dsh-enter-y: 0px; --dsh-enter-o: 1; }
+  #root > [data-dsh-enter-ready] > * {
+    transform: translate3d(var(--dsh-enter-x, 0px), var(--dsh-enter-y, 0px), 0);
+    opacity: var(--dsh-enter-o, 1);
+    will-change: transform, opacity;
+  }
+  /* 首帧即入场：浏览器在首次样式解析阶段就把元素放到"起点"，不经过中间帧 */
+  @starting-style {
+    #root > [data-dsh-enter-ready] > * {
+      opacity: var(--dsh-enter-o0, 0);
+      transform: translate3d(var(--dsh-enter-x0, 0px), var(--dsh-enter-y0, 0px), 0);
+    }
+  }
+  /* 降级：不支持 @starting-style 时，先整体隐藏再由 JS 放行 */
+  @supports not (background: paint(x)) {
+    html[data-dsh-enter-pending] #root > [data-dsh-enter-ready] > * { opacity: 0; }
+  }
+}

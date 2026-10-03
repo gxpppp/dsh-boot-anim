@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>starting-style probe</title>
+<style>
+  html,body{margin:0;background:#000;height:100%}
+  #box{width:200px;height:100px;background:#e33;opacity:1;transform:translateX(0);}
+  #box{transition:opacity 400ms linear, transform 400ms linear; }
+  @starting-style{
+    #box{opacity:0;transform:translateX(-80px);}
+  }
+  #ctl{width:200px;height:100px;background:#3e3;transition:opacity 400ms linear,transform 400ms linear;}
+</style></head><body>
+<div id="box"></div><div id="ctl"></div>
+<script>
+window.__R__ = { t0: performance.now(), marks: [] };
+const m = (k, extra) => window.__R__.marks.push({ k, t: +(performance.now() - window.__R__.t0).toFixed(2), ...(extra||{}) });
+const box = document.getElementById('box');
+const ctl = document.getElementById('ctl');
+m('inline', { boxOpacity: getComputedStyle(box).opacity, boxTransform: getComputedStyle(box).transform });
+
+// CSS.supports 检查
+window.__R__.supports = {
+  startingStyle: CSS.supports('@starting-style') || document.styleSheets.length > 0,
+  transitionBehavior: CSS.supports('transition-behavior', 'allow-discrete'),
+  has: CSS.supports('selector(:has(*))'),
+  viewTransition: typeof document.startViewTransition === 'function',
+  animationApi: typeof Element.prototype.animate === 'function',
+  ua: navigator.userAgent,
+};
+for (const ev of ['transitionrun','transitionstart','transitionend']) {
+  box.addEventListener(ev, e => m(ev, { prop: e.propertyName }), { once: false });
+  ctl.addEventListener(ev, e => m('ctl:'+ev, { prop: e.propertyName }), { once: false });
+}
+requestAnimationFrame(() => {
+  m('raf1', { boxOpacity: getComputedStyle(box).opacity, boxTransform: getComputedStyle(box).transform, ctlOpacity: getComputedStyle(ctl).opacity });
+});
+setTimeout(() => m('t300', { boxOpacity: getComputedStyle(box).opacity }), 300);
+setTimeout(() => { window.__DONE__ = true; }, 900);
+</script>
+</body></html>

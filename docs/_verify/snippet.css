@@ -1,0 +1,17 @@
+@layer dsh-enter-anim {
+  /* 1. 只作用于被标记的 frame，避免污染其它页面 */
+  #root > [data-dsh-enter-ready] > * {
+    transform: translate3d(var(--dsh-enter-x, 0px), var(--dsh-enter-y, 0px), 0);
+    opacity: var(--dsh-enter-o, 1);
+    will-change: transform, opacity;
+  }
+  /* 2. 首帧即入场：浏览器在"首次样式解析"阶段就把元素放到起点，不经过中间帧 */
+  @starting-style {
+    #root > [data-dsh-enter-ready] > * {
+      opacity: var(--dsh-enter-o0, 0);
+      transform: translate3d(var(--dsh-enter-x0, 0px), var(--dsh-enter-y0, 0px), 0);
+    }
+  }
+  /* 3. 动画期间禁掉横向滚动条抖动 */
+  html[data-dsh-enter-pending] { overflow-x: clip; }
+}

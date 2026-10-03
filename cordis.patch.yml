@@ -1,0 +1,6 @@
+# @local/dsh-boot-anim — loader patch 层。
+# 只做一件事：把插件插入 desktop profile 的插件树。
+# 插件本身通过 webserver/index-inject 注入前端资源，不需要任何 HTTP 路由。
+- insert:
+    - id: boot-anim
+      name: '@local/dsh-boot-anim'
