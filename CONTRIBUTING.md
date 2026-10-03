@@ -2,6 +2,17 @@
 
 欢迎提交 issue 和 PR。本插件体量小，规则也少，但有几条是硬的。
 
+## 关于 git 传输
+
+本机环境下 `github.com` 的 HTTPS 走代理时 TLS 握手常被掐断（实测成功率约 1/10，
+而 `api.github.com` 是 10/10），因此本仓库的 origin 使用 **SSH**：
+
+```
+git@github.com:gxpppp/dsh-boot-anim.git
+```
+
+若你也在类似网络下，建议同样走 SSH；`ssh.github.com:443` 亦可作为 22 端口被封时的备选。
+
 ## 提交前
 
 @@```bash
