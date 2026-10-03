@@ -1,7 +1,10 @@
 * text=auto eol=lf
 
 # PowerShell 脚本必须带 UTF-8 BOM，否则 Windows PowerShell 5.1 会按 ANSI 解析中文而报语法错误。
-*.ps1 text eol=crlf working-tree-encoding=UTF-8-BOM
+# BOM 由文件自身携带（不由 git 注入）：working-tree-encoding 会让 git 再写一次 BOM，
+# 与文件里已有的 BOM 冲突，报 "failed to encode ... from UTF-8-BOM to UTF-8"。
+# 故这里只管行尾，不管编码 —— 工作区与仓库都存带 BOM 的 UTF-8。
+*.ps1 text eol=crlf
 
 # 二进制，不做行尾转换。
 *.png binary

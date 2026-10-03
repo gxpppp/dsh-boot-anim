@@ -1,6 +1,10 @@
-# @local/dsh-boot-anim — loader patch 层。
-# 只做一件事：把插件插入 desktop profile 的插件树。
+# dsh-boot-anim — loader patch 层。
+# 只做一件事：把插件插入 profile 的插件树。
 # 插件本身通过 webserver/index-inject 注入前端资源，不需要任何 HTTP 路由。
+#
+# 注意：这里的 name 必须与 package.json 的 name 完全一致 ——
+# 加载器的 resolveBundleDir() 按这个名字去 node_modules 里找包，
+# 两者不一致会导致「静默跳过」（被丢进 skippedBundles，界面无任何提示）。
 - insert:
     - id: boot-anim
-      name: '@local/dsh-boot-anim'
+      name: 'dsh-boot-anim'

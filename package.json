@@ -1,14 +1,40 @@
 {
-  "name": "@local/dsh-boot-anim",
-  "version": "1.0.0",
-  "private": true,
+  "name": "dsh-boot-anim",
+  "version": "1.1.0",
   "type": "module",
-  "description": "DSH 桌面端启动动画（SteamOS 风格分镜）与 UI 分层入场过渡。纯宿主侧 index 注入，无 HTTP 路由、无源码改动。",
+  "description": "DSH 桌面端启动动画（SteamOS 风格七段分镜）与 UI 由外向内分层入场过渡。宿主侧插件，经 webserver/index-inject 注入，零依赖、零源码改动。",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "boot-animation",
+    "splash-screen",
+    "ui-animation",
+    "svg-animation",
+    "web-animations-api",
+    "steamos"
+  ],
   "license": "MIT",
+  "author": "gxpppp",
+  "homepage": "https://github.com/gxpppp/dsh-boot-anim#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gxpppp/dsh-boot-anim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gxpppp/dsh-boot-anim/issues"
+  },
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js"
   },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"

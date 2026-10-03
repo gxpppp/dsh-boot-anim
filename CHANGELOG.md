@@ -3,6 +3,24 @@
 本项目的所有重要变更都记录在此文件。
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.0] - 2026-10-03
+
+面向分发改造。
+
+### 变更（**破坏性**）
+
+- **包名从 `@local/dsh-boot-anim` 改为 `dsh-boot-anim`**
+  —— 与仓库名一致。旧名带 `@local/` 作用域且在 npm 上不存在，
+  `dsh plugin add` 无法解析；改名后可用
+  `dsh plugin --profile desktop add github:gxpppp/dsh-boot-anim` 直接安装。
+- 移除 `private: true`，补全 `keywords` / `repository` / `homepage` / `bugs` /
+  `author` / `files` 字段。
+
+### 迁移
+
+已有安装执行一次 `install.ps1` 即可，脚本会自动移除旧的
+`@local/dsh-boot-anim` 依赖与 bundles 条目。
+
 ## [1.0.0] - 2026-10-03
 
 首个版本。

@@ -1,4 +1,4 @@
-/* @local/dsh-boot-anim — 舞台样式。
+/* dsh-boot-anim — 舞台样式。
    全部选择器以 [data-dsh-boot-anim] 作用域前缀，不触碰应用自身的任何类名、令牌或布局。
    动效数值（曲线 / 时长 / 位移）统一由 lib/boot-anim.js 顶部的 T 令牌驱动，
    出处见 docs/01-方案检索清单.md 的 B2 / B6 / B7。 */

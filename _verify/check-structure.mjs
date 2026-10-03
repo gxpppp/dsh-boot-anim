@@ -13,14 +13,14 @@ const fail = (m) => { console.error('  FAIL ' + m); failed++ }
 console.log('=== 一、结构完整性 ===')
 
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-if (pkg.name !== '@local/dsh-boot-anim') fail('package name 应为 @local/dsh-boot-anim，实际 ' + pkg.name)
+if (pkg.name !== 'dsh-boot-anim') fail('package name 应为 dsh-boot-anim，实际 ' + pkg.name)
 else ok('package name = ' + pkg.name)
 
 if (!pkg.dsh?.bundle?.patch) fail('package.json 缺 dsh.bundle.patch')
 else ok('dsh.bundle.patch = ' + pkg.dsh.bundle.patch)
 
 const patch = fs.readFileSync(pkg.dsh.bundle.patch, 'utf8')
-if (!patch.includes('@local/dsh-boot-anim')) fail('cordis.patch.yml 未引用本包')
+if (!patch.includes('dsh-boot-anim')) fail('cordis.patch.yml 未引用本包')
 else ok('cordis.patch.yml 引用了本包')
 
 const js = fs.readFileSync('lib/boot-anim.js', 'utf8')

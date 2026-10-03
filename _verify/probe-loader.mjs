@@ -55,10 +55,10 @@ console.log('profile.name =', profile.name)
 console.log('layers 数量 =', profile.layers.length)
 console.log('skippedBundles 数量 =', profile.skippedBundles.length)
 
-const mine = profile.layers.find((l) => l.packageName === '@local/dsh-boot-anim')
+const mine = profile.layers.find((l) => l.packageName === 'dsh-boot-anim')
 console.log('')
 console.log('=== 我的 bundle 是否被接受 ===')
-console.log('找到 @local/dsh-boot-anim:', mine ? 'YES' : 'NO')
+console.log('找到 dsh-boot-anim:', mine ? 'YES' : 'NO')
 
 if (mine) {
   console.log('  patchPaths =', JSON.stringify(mine.patchPaths))
@@ -74,6 +74,6 @@ for (const s of profile.skippedBundles) {
   console.log('    原因:', String(s.reason).slice(0, 300))
 }
 
-const ok = mine !== undefined && profile.skippedBundles.every((s) => s.packageName !== '@local/dsh-boot-anim')
+const ok = mine !== undefined && profile.skippedBundles.every((s) => s.packageName !== 'dsh-boot-anim')
 console.log('')
 console.log('VERDICT =', ok ? 'PASS — 加载器接受了该 bundle' : 'FAIL')

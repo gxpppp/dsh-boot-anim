@@ -45,3 +45,6 @@ _verify/realfront.png
 _verify/harness.*.html
 _verify/rec-raw/
 docs/media/frames/
+
+# 迁移/诊断时的 profile 快照（含机器路径与真实配置）。
+_verify/migrate-backup/

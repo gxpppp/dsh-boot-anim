@@ -81,23 +81,35 @@ resources/app.asar/lib/main.js
 
 ## 快速开始
 
-### 安装
+### 一条命令安装（推荐）
+
+````bash
+dsh plugin --profile desktop add github:gxpppp/dsh-boot-anim
+````
+
+然后把包名加进 profile 的 `dsh.profile.bundles`（安装命令只写依赖，不改 bundles）：
+
+````jsonc
+"dsh": { "profile": { "bundles": [ /* …既有… */ , "dsh-boot-anim" ] } }
+````
+
+重启「DeepSeek Harness」桌面版即可。
+
+> **为什么还要手动加 bundles**：`dsh plugin add` 只把包装进 `node_modules`，
+> 而插件要生效必须出现在 `dsh.profile.bundles` 里。这是 DSH 当前的行为，不是本插件的要求。
+
+### 从本地目录安装（改代码即时生效）
+
+适合自己改动画、不想每次 commit 的场景：
 
 ````powershell
-# 在本仓库根目录执行
+git clone https://github.com/gxpppp/dsh-boot-anim.git
+cd dsh-boot-anim
 powershell -ExecutionPolicy Bypass -File install.ps1
 ````
 
-然后**重启「DeepSeek Harness」桌面应用**。
-
-脚本会：备份 profile 的 `package.json` → 加一条 `link:` 依赖 → 往 `dsh.profile.bundles` 追加本包 →
-在 `node_modules/@local/` 建 junction。它**不触碰 DSH 安装目录**。
-
-可用参数覆盖路径：
-
-````powershell
-.\install.ps1 -PluginDir "D:\somewhere\dsh-boot-anim" -ProfileDir "$env:USERPROFILE\.dsh\profiles\desktop"
-````
+脚本做三件事——加 `link:` 依赖、追加到 `bundles`、建 junction 到 `node_modules`。
+因为用的是 junction，**改完 `lib/` 下的文件刷新页面即可看到效果**，不必重新安装。
 
 ### 卸载
 
@@ -105,21 +117,15 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 powershell -ExecutionPolicy Bypass -File uninstall.ps1
 ````
 
-### 不重启也能看动画
+用 `dsh plugin add` 装的，则用 `dsh plugin --profile desktop remove dsh-boot-anim`，
+并自行从 `bundles` 里删掉包名。
 
-无头 Chromium 跑的是**同一份 CSS / JS**：
+### 包名必须与仓库名一致
 
-````powershell
-powershell -ExecutionPolicy Bypass -File verify-headless.ps1
-````
+这不是洁癖，是硬约束：加载器的 `resolveBundleDir()` 按 `dsh.profile.bundles` 里的名字
+去 `node_modules` 找包。名字对不上就会被丢进 `skippedBundles` —— **静默跳过，界面无任何提示**。
 
-需要 Playwright。可用 `-PlaywrightEntry` 或 `DSH_PLAYWRIGHT` 环境变量指定它的位置：
-
-````powershell
-.\verify-headless.ps1 -PlaywrightEntry "D:\path\to\playwright\index.mjs"
-````
-
-逐帧截图会写到 `_verify/f*.png`。
+所以 package.json 的 `name` 是 `dsh-boot-anim`，仓库名也是 `dsh-boot-anim`。
 
 ---
 
