@@ -61,7 +61,7 @@ for (const [label, needle] of [
   else ok(label + ' 就位')
 }
 
-for (const f of ['LICENSE', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'cordis.patch.yml']) {
+for (const f of ['LICENSE', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'cordis.patch.yml']) {
   if (!fs.existsSync(f)) fail('缺根文件 ' + f)
   else ok('根文件 ' + f + ' 存在')
 }

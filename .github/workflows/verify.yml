@@ -31,3 +31,10 @@ jobs:
       - name: 结构完整性检查
         run: node _verify/check-structure.mjs
 
+      - name: 社区文件齐全性
+        run: |
+          for f in LICENSE README.md CHANGELOG.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md; do
+            if [ ! -f "$f" ]; then echo "缺少 $f"; exit 1; fi
+            echo "ok   $f"
+          done
+
